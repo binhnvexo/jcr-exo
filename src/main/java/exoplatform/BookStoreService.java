@@ -17,7 +17,6 @@
 package exoplatform;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.jcr.RepositoryException;
@@ -33,7 +32,6 @@ import exoplatform.entity.Author;
 import exoplatform.entity.Book;
 import exoplatform.entity.Book.CATEGORY;
 import exoplatform.exception.DuplicateBookException;
-import exoplatform.utils.Utils;
 
 /**
  * Created by The eXo Platform SAS
@@ -149,8 +147,8 @@ public class BookStoreService implements Startable {
       addBook("Hibernate in action", CATEGORY.TECHNICAL, "Hibernate");
       addBook("Napoleon", CATEGORY.HISTORY, "Napoleon");
       addBook("Jouney to the West", CATEGORY.COMICS, "Jouney to the West");
-    } catch (DuplicateBookException e) {
-      e.printStackTrace();
+    } catch (DuplicateBookException de) {
+      log.error("Duplicate book", de);
     }
   } 
   
