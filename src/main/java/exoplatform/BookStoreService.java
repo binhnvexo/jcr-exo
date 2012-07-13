@@ -19,6 +19,7 @@ package exoplatform;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
 import org.exoplatform.services.cache.CacheService;
@@ -70,14 +71,15 @@ public class BookStoreService implements Startable {
   public void start() {
     jcrDataStorage.init();
 //    List<Book> books = new ArrayList<Book>(); 
-//    try {
-//      addBook("The Mask", CATEGORY.NOVEL, "Test");
-//    } catch (DuplicateBookException e) {
-//      // TODO Auto-generated catch block
-//      e.printStackTrace();
-//    }
-    addMultiBook();
-    addMultiAuthor();
+    try {
+      Node authorNode = addAuthor("Conan Doyle", "England", "123456789");
+      addBook("The Mask", CATEGORY.NOVEL, "Test", authorNode);
+    } catch (DuplicateBookException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+//    addMultiBook();
+//    addMultiAuthor();
 //    books = searchBookByNameLikeXPath("Holme");
 //    if (books != null && books.size() > 0) {
 //      for (Book book : books) {
@@ -107,9 +109,9 @@ public class BookStoreService implements Startable {
    * @return
    * @throws DuplicateBookException
    */
-  public Book addBook(String bookName, CATEGORY category, String content) throws DuplicateBookException {
+  public Book addBook(String bookName, CATEGORY category, String content, Node node) throws DuplicateBookException {
     Book book = new Book(bookName, category, content);
-    return jcrDataStorage.addBook(book);
+    return jcrDataStorage.addBook(book, node);
   }
   
   /**
@@ -119,7 +121,7 @@ public class BookStoreService implements Startable {
    * @param authorPhone
    * @return
    */
-  public Author addAuthor(String authorName, String authorAddress, String authorPhone) {
+  public Node addAuthor(String authorName, String authorAddress, String authorPhone) {
     Author author = new Author(authorName, authorAddress, authorPhone);
     return jcrDataStorage.addAuthor(author);
   }
@@ -140,16 +142,16 @@ public class BookStoreService implements Startable {
    * This function support for add multi book to datastorage
    */
   public void addMultiBook() {
-    try {
-      addBook("Shelock Holme", CATEGORY.NOVEL, "The sign of the Four");
-      addBook("Alice in wonder land", CATEGORY.COMICS, "Alice in wonder land");
-      addBook("Seal team six", CATEGORY.NOVEL, "Seal team six");
-      addBook("Hibernate in action", CATEGORY.TECHNICAL, "Hibernate");
-      addBook("Napoleon", CATEGORY.HISTORY, "Napoleon");
-      addBook("Jouney to the West", CATEGORY.COMICS, "Jouney to the West");
-    } catch (DuplicateBookException de) {
-      log.error("Duplicate book", de);
-    }
+//    try {
+//      addBook("Shelock Holme", CATEGORY.NOVEL, "The sign of the Four");
+//      addBook("Alice in wonder land", CATEGORY.COMICS, "Alice in wonder land");
+//      addBook("Seal team six", CATEGORY.NOVEL, "Seal team six");
+//      addBook("Hibernate in action", CATEGORY.TECHNICAL, "Hibernate");
+//      addBook("Napoleon", CATEGORY.HISTORY, "Napoleon");
+//      addBook("Jouney to the West", CATEGORY.COMICS, "Jouney to the West");
+//    } catch (DuplicateBookException de) {
+//      log.error("Duplicate book", de);
+//    }
   } 
   
   /**

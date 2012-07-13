@@ -147,10 +147,7 @@ public class JCRDataStorage {
    * @return Book
    * @throws DuplicateBookException
    */
-  public Book addBook(Book book) throws DuplicateBookException {
-    System.out.println("+ ========================================================================== +");
-    System.out.println("+                         add book function                                  +");
-    System.out.println("+ ========================================================================== +");
+  public Book addBook(Book book, Node node) throws DuplicateBookException {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     /* Check exist of book */
     if (isExistBookName(book.getName(), sProvider)) {
@@ -163,32 +160,24 @@ public class JCRDataStorage {
     try {
       /* execute set data to node and save to workspace */
       Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_BOOK_PATH, sProvider);
-      System.out.println("+ ========================================================================== +");
-      System.out.println("+                         " + parentNode.getPath() + "                       +");
-      System.out.println("+ ========================================================================== +");
       Node bookNode = parentNode.addNode("" + book.getId(), BookNodeTypes.EXO_BOOK);
       bookNode.setProperty(BookNodeTypes.EXO_BOOK_NAME, book.getName());
       bookNode.setProperty(BookNodeTypes.EXO_BOOK_CATEGORY, Utils.bookCategoryEnumToString(book.getCategory()));
       bookNode.setProperty(BookNodeTypes.EXO_BOOK_CONTENT, book.getContent());
+      bookNode.setProperty(BookNodeTypes.EXO_BOOK_AUTHOR, node);
       parentNode.getSession().save();
       return book;
     } catch (PathNotFoundException e) {
-      System.out.println("+ ========================================================================== +");
-      System.out.println("+                         Path not found exception                           +");
-      System.out.println("+ ========================================================================== +");
       return null;
     } catch (RepositoryException e) {
       log.error("Failed to add book", e);
-      System.out.println("+ ========================================================================== +");
-      System.out.println("+                              Repository exception                          +");
-      System.out.println("+ ========================================================================== +");
       return null;
     } finally {
       sProvider.close();
     }
   }
   
-  public Author addAuthor(Author author) {
+  public Node addAuthor(Author author) {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     author.setId(Utils.authorId++);
     try {
@@ -198,7 +187,7 @@ public class JCRDataStorage {
       authorNode.setProperty(BookNodeTypes.EXO_AUTHOR_ADDRESS, author.getAddress());
       authorNode.setProperty(BookNodeTypes.EXO_AUTHOR_PHONE, author.getPhone());
       parentNode.getSession().save();
-      return author;
+      return authorNode;
     } catch (RepositoryException re) {
       log.error("Failed to add author", re);
       return null;

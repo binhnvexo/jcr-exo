@@ -4,6 +4,7 @@
 	<nodeType name="exostore:book" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
 		<supertypes>
 			<supertype>nt:base</supertype>
+			<supertype>mix:referenceable</supertype>
 		</supertypes>
 		<propertyDefinitions>
 			<propertyDefinition name="exostore:bookname" requiredType="String" autoCreated="false" mandatory="false" 
@@ -18,12 +19,17 @@
 						onParentVersion="COPY" protected="false" multiple="false">
 				<valueConstraints/>
 			</propertyDefinition>
+			<propertyDefinition name="exostore:author" requiredType="Reference" autoCreated="false" mandatory="false" 
+			    		onParentVersion="COPY" protected="false" multiple="false">
+        		<valueConstraints/>
+      		</propertyDefinition>
 		</propertyDefinitions>
 	</nodeType>
 	
 	<nodeType name="exostore:author" isMixin="false" hasOrderableChildNodes="false" primaryItemName="">
 		<supertypes>
 			<supertype>nt:base</supertype>
+			<supertype>mix:referenceable</supertype>
 		</supertypes>
 		<propertyDefinitions>
 			<propertyDefinition name="exostore:authorname" requiredType="String" autoCreated="false" mandatory="false" 

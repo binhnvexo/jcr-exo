@@ -32,6 +32,8 @@ public interface BookNodeTypes {
   public static final String EXO_BOOK_CATEGORY = "exostore:bookcategory";
   /* exostore:bookcontent is a property of exostore:book */
   public static final String EXO_BOOK_CONTENT = "exostore:bookcontent";
+  /* exostore:bookcontent is a property of exostore:book */
+  public static final String EXO_BOOK_AUTHOR = "exostore:author";
   
   /* define parent node of author */
   public static final String EXO_AUTHOR = "exostore:author";
