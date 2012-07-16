@@ -40,6 +40,13 @@ public class Utils {
    **/
   public static int authorId = 0;
   
+  /** 
+   * Define a static variable which contain id of user 
+   * id of user will increase 1 value when a new user create
+   * 
+   **/
+  public static int userId = 0;
+  
   /**
    * Convert enum value to String value 
    * 

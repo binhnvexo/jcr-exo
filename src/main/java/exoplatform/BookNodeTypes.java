@@ -44,4 +44,17 @@ public interface BookNodeTypes {
   /* exostore:authorphone is a property of exostore:author */
   public static final String EXO_AUTHOR_PHONE = "exostore:authorphone";
   
+  /* define parent node of user */
+  public static final String EXO_USER = "exostore:user";
+  /* exostore:username is a property of exostore:user */
+  public static final String EXO_USER_NAME = "exostore:username";
+  /* exostore:password is a property of exostore:user */
+  public static final String EXO_USER_PASSWORD = "exostore:password";
+  /* exostore:fullname is a property of exostore:user */
+  public static final String EXO_USER_FULLNAME = "exostore:fullname";
+  /* exostore:useraddress is a property of exostore:user */
+  public static final String EXO_USER_ADDRESS = "exostore:useraddress";
+  /* exostore:userphone is a property of exostore:user */
+  public static final String EXO_USER_PHONE = "exostore:userphone";
+  
 }

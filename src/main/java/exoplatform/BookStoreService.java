@@ -17,10 +17,12 @@
 package exoplatform;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 
 import org.exoplatform.services.cache.CacheService;
 import org.exoplatform.services.cache.ExoCache;
@@ -32,6 +34,7 @@ import org.picocontainer.Startable;
 import exoplatform.entity.Author;
 import exoplatform.entity.Book;
 import exoplatform.entity.Book.CATEGORY;
+import exoplatform.entity.User;
 import exoplatform.exception.DuplicateBookException;
 
 /**
@@ -73,9 +76,15 @@ public class BookStoreService implements Startable {
 //    List<Book> books = new ArrayList<Book>(); 
     try {
       Node authorNode = addAuthor("Conan Doyle", "England", "123456789");
-      addBook("The Mask", CATEGORY.NOVEL, "Test", authorNode);
+      Node bookNode = addBook("The Mask", CATEGORY.NOVEL, "Test", authorNode.getPath());
+      Node bookNode1 = addBook("The Sign of the four", CATEGORY.NOVEL, "Test", authorNode.getPath());
+      List<String> nodes = new ArrayList<String>();
+      nodes.add(bookNode.getPath());
+      nodes.add(bookNode1.getPath());
+      Node userNode = addUser("binhnv", "12345", "Nguyen Vinh Binh", "Hanoi", "123456789", nodes);
     } catch (DuplicateBookException e) {
-      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (RepositoryException e) {
       e.printStackTrace();
     }
 //    addMultiBook();
@@ -109,9 +118,9 @@ public class BookStoreService implements Startable {
    * @return
    * @throws DuplicateBookException
    */
-  public Book addBook(String bookName, CATEGORY category, String content, Node node) throws DuplicateBookException {
+  public Node addBook(String bookName, CATEGORY category, String content, String nodePath) throws DuplicateBookException {
     Book book = new Book(bookName, category, content);
-    return jcrDataStorage.addBook(book, node);
+    return jcrDataStorage.addBook(book, nodePath);
   }
   
   /**
@@ -124,6 +133,11 @@ public class BookStoreService implements Startable {
   public Node addAuthor(String authorName, String authorAddress, String authorPhone) {
     Author author = new Author(authorName, authorAddress, authorPhone);
     return jcrDataStorage.addAuthor(author);
+  }
+  
+  public Node addUser(String username, String password, String fullname, String address, String phone, List<String> nodes) {
+    User user = new User(username, password, fullname, address, phone);
+    return jcrDataStorage.addUser(user, nodes);
   }
   
   /**

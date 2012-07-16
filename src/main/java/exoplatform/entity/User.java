@@ -20,61 +20,95 @@ package exoplatform.entity;
  * Created by The eXo Platform SAS
  * Author : BinhNV
  *          binhnv@exoplatform.com
- * Jul 13, 2012  
+ * Jul 16, 2012  
  */
-public class Author {
+public class User {
 
-  private int authorId;
-  private String name;
+  private int userId;
+  private String username;
+  private String password;
+  private String fullname;
   private String address;
   private String phone;
   
   /**
-   * Author constructor without param
+   * User constructor without parameter
    */
-  public Author() {
+  public User() {
     
   }
   
   /**
-   * Author constructor with param
+   * User constructor with parameter
    * 
-   * @param name The name of author
-   * @param address The address of author
-   * @param phone The phone of author
+   * @param username
+   * @param password
+   * @param fullname
+   * @param address
+   * @param phone
    */
-  public Author(String name, String address, String phone) {
-    this.name = name;
+  public User(String username, String password, String fullname, String address, String phone) {
+    this.username = username;
+    this.password = password;
+    this.fullname = fullname;
     this.address = address;
     this.phone = phone;
   }
 
   /**
-   * @return the id
+   * @return the userId
    */
-  public int getAuthorId() {
-    return authorId;
+  public int getUserId() {
+    return userId;
   }
 
   /**
-   * @param id the id to set
+   * @param userId the userId to set
    */
-  public void setAuthorId(int authorId) {
-    this.authorId = authorId;
+  public void setUserId(int userId) {
+    this.userId = userId;
   }
 
   /**
-   * @return the name
+   * @return the username
    */
-  public String getName() {
-    return name;
+  public String getUsername() {
+    return username;
   }
 
   /**
-   * @param name the name to set
+   * @param username the username to set
    */
-  public void setName(String name) {
-    this.name = name;
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  /**
+   * @return the password
+   */
+  public String getPassword() {
+    return password;
+  }
+
+  /**
+   * @param password the password to set
+   */
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
+  /**
+   * @return the fullname
+   */
+  public String getFullname() {
+    return fullname;
+  }
+
+  /**
+   * @param fullname the fullname to set
+   */
+  public void setFullname(String fullname) {
+    this.fullname = fullname;
   }
 
   /**

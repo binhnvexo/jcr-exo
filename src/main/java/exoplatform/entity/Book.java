@@ -30,7 +30,7 @@ public class Book {
     NOVEL, MANGA, COMICS, TECHNICAL, MATHS, HISTORY
   }
   /* id of book */
-  private int id;
+  private int bookId;
   /* name of book */
   private String name;
   /*category of book*/
@@ -63,14 +63,14 @@ public class Book {
   /**
    * @return the id
    */
-  public int getId() {
-    return id;
+  public int getBookId() {
+    return bookId;
   }
   /**
    * @param id the id to set
    */
-  public void setId(int id) {
-    this.id = id;
+  public void setBookId(int bookId) {
+    this.bookId = bookId;
   }
   /**
    * @return the name
