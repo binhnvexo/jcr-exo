@@ -14,62 +14,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package exoplatform.entity;
+package exoplatform;
 
-import org.apache.lucene.store.Lock.With;
+import junit.framework.TestCase;
 
 /**
  * Created by The eXo Platform SAS
  * Author : BinhNV
  *          binhnv@exoplatform.com
- * Jul 16, 2012  
+ * Jul 17, 2012  
  */
-public class BookUser {
-
-  private int userId;
-  private int bookId;
-  
-  /**
-   * BookUser constructor without parameter
-   */
-  public BookUser() {
-    
-  }
-  
-  /**
-   * BookUser constructor with parameter
-   */
-  public BookUser(int userId, int bookId) {
-    this.userId = userId;
-    this.bookId = bookId;
-  }
-
-  /**
-   * @return the userId
-   */
-  public int getUserId() {
-    return userId;
-  }
-
-  /**
-   * @param userId the userId to set
-   */
-  public void setUserId(int userId) {
-    this.userId = userId;
-  }
-
-  /**
-   * @return the bookId
-   */
-  public int getBookId() {
-    return bookId;
-  }
-
-  /**
-   * @param bookId the bookId to set
-   */
-  public void setBookId(int bookId) {
-    this.bookId = bookId;
-  }
+public class BookStoreTest extends TestCase {
 
 }

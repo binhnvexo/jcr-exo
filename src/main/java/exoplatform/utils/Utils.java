@@ -67,10 +67,7 @@ public class Utils {
    * @return Book.CATEGORY of category
    */
   public static Book.CATEGORY bookCategoryStringToEnum(String category) {
-    if (category != null) {
-      return Book.CATEGORY.valueOf(category);
-    }
-    return null;
+    return category != null ? Book.CATEGORY.valueOf(category) : null;
   }
   
 }

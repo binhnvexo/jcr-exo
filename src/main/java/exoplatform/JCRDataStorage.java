@@ -57,10 +57,13 @@ public class JCRDataStorage {
   private static final Log log = ExoLogger.getLogger(JCRDataStorage.class);
   /* Define a constant of parent path */
   public static final String DEFAULT_PARENT_PATH = "/exostore:bookstore";
+  /* Define a constant of book path */
   public static final String DEFAULT_PARENT_BOOK_PATH = "/exostore:book";
+  /* Define a constant of author path */
   public static final String DEFAULT_PARENT_AUTHOR_PATH = "/exostore:author";
+  /* Define a constant of user path */
   public static final String DEFAULT_PARENT_USER_PATH = "/exostore:user";
-  public static final String DEFAULT_PARENT_BOOK_USER_PATH = "/exostore:bookuser";
+  /* Define a constant of workspace path */
   public static final String DEFAULT_WORKSPACE_NAME = "bookstore";
   /* Define a RepositoryService which support integrate with repository */
   private RepositoryService repoService;
@@ -74,7 +77,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function prepare node and data for repository
+   * Prepare node and data for repository
    */
   public void init() {
     /* create SessionProvider */
@@ -100,7 +103,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support for get node from path  
+   * get node from path  
    * 
    * @param nodePath The path of node by String type
    * @param sessionProvider The session 
@@ -112,7 +115,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function get session provider and return a session of workspace
+   * get session provider and return a session of workspace
    * 
    * @param sessionProvider
    * @return The session
@@ -124,7 +127,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support for get book by book id
+   * get book by book id
    * 
    * @param id The id of book
    * @return Book
@@ -132,10 +135,8 @@ public class JCRDataStorage {
   public Book getBook(String id) {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
-      Node node = getNodeByPath(DEFAULT_PARENT_PATH + "/" + id, sProvider);
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_BOOK_PATH + "/" + id, sProvider);
       return createBookByNode(node);
-    } catch (PathNotFoundException pe) {
-      return null;
     } catch (RepositoryException re) {
       log.error("Can not find this book", re);
       return null;
@@ -144,10 +145,16 @@ public class JCRDataStorage {
     }
   }
   
+  /**
+   * get user by user id
+   * 
+   * @param id
+   * @return
+   */
   public User getUser(String id) {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
-      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_USER_PATH, sProvider);
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_USER_PATH + "/" + id, sProvider);
       return createUserByNode(node);
     } catch (RepositoryException re) {
       log.error("Can not find this user", re);
@@ -158,7 +165,26 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function which add new book to workspace
+   * get author by author id
+   * 
+   * @param id
+   * @return
+   */
+  public Author getAuthor(String id) {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH + "/" + id, sProvider);
+      return createAuthorByNode(node);
+    } catch (RepositoryException re) {
+      log.error("Can not find this author", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * add new book to workspace
    * 
    * @param book The new book which want to add
    * @return Book
@@ -185,9 +211,6 @@ public class JCRDataStorage {
       bookNode.setProperty(BookNodeTypes.EXO_BOOK_AUTHOR, getNodeByPath(nodePath, sProvider));
       parentNode.getSession().save();
       return bookNode;
-    } catch (PathNotFoundException e) {
-      log.error("Path not found", e);
-      return null;
     } catch (RepositoryException e) {
       log.error("Failed to add book", e);
       return null;
@@ -196,8 +219,18 @@ public class JCRDataStorage {
     }
   }
   
-  public Node addAuthor(Author author) {
+  /**
+   * add new author
+   * 
+   * @param author
+   * @return
+   * @throws DuplicateBookException
+   */
+  public Node addAuthor(Author author) throws DuplicateBookException {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
+    if (isExistAuthorName(author.getName(), sProvider)) {
+      throw new DuplicateBookException(String.format("Author %s is existed", author.getName()));
+    }
     author.setAuthorId(Utils.authorId++);
     try {
       Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH, sProvider);
@@ -215,8 +248,19 @@ public class JCRDataStorage {
     }
   }
   
-  public Node addUser(User user, List<String> nodes) {
+  /**
+   * add new user
+   * 
+   * @param user
+   * @param nodes
+   * @return
+   * @throws DuplicateBookException
+   */
+  public Node addUser(User user, List<String> nodes) throws DuplicateBookException {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
+    if (isExistUserName(user.getUsername(), sProvider)) {
+      throw new DuplicateBookException(String.format("User %s is existed", user.getUsername()));
+    }
     user.setUserId(Utils.userId++);
     try {
       Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_USER_PATH, sProvider);
@@ -243,7 +287,158 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support delete a book by book id
+   * get user by name with sql statement
+   * 
+   * @param username
+   * @return
+   */
+  public User getUserByNameSQL(String username) {
+    username.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    username = username.trim();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    StringBuffer queryString = new StringBuffer("Select * from " + BookNodeTypes.EXO_USER);
+    queryString.append(" where " + BookNodeTypes.EXO_USER_NAME + " = '" + username + "'");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryString.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return createUserByNode(node);
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not get user by name", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * get user by book name
+   * 
+   * @param bookName
+   * @return
+   */
+  public User getUserByBookQuery(String bookName) {
+    bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    bookName = bookName.trim();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    StringBuffer queryString = new StringBuffer("Select * from " + BookNodeTypes.EXO_USER);
+    queryString.append(" where /" + BookNodeTypes.EXO_BOOK + "/" + BookNodeTypes.EXO_BOOK_NAME + "=" + bookName + "'");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryString.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return createUserByNode(node);
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not get user by name", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * get user by name with xpath
+   * 
+   * @param username
+   * @return
+   */
+  public User getUserByNameXPath(String username) {
+    username.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    username = username.trim();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    StringBuffer queryString = new StringBuffer("//element(*, " + BookNodeTypes.EXO_USER
+        + ")[(jcr:like(@" + BookNodeTypes.EXO_USER_NAME + ",'%" + username + "%'" + ") and @" + BookNodeTypes.EXO_USER_ADDRESS + "='Hanoi'" + ")]");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryString.toString(), Query.XPATH);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        PropertyReader reader = new PropertyReader(node);        
+        return createUserByNode(node);
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not get user by name(XPath)", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }    
+  }
+  
+  /**
+   * get user by name in range with sql statement 
+   * 
+   * @param username
+   */
+  public User getUserByNameLimtSQL(String username) {
+    username.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    username = username.trim();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    StringBuffer queryString = new StringBuffer("Select * from " + BookNodeTypes.EXO_USER);
+    queryString.append(" where " + BookNodeTypes.EXO_USER_NAME + " = '" + username + "'");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      QueryImpl query = (QueryImpl) queryManager.createQuery(queryString.toString(), Query.SQL);
+      query.setOffset(0L);
+      query.setLimit(3L);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return createUserByNode(node);
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not get user by name", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * get user by name in range with xpath statement 
+   * 
+   * @param username
+   * @return
+   */
+  public User getUserByNameLimtXPath(String username) {
+    username.replaceAll("\"", "\\\"").replace("-", StringUtils.EMPTY);
+    username = username.trim();
+    StringBuffer sb = new StringBuffer("//element(*," + BookNodeTypes.EXO_USER + ")");
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      QueryImpl query = (QueryImpl) queryManager.createQuery(sb.toString(), Query.XPATH);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return createUserByNode(node);
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not get user by name(XPath)", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * delete a book by book id
    * 
    * @param id The id of book
    * @throws BookNotFoundException
@@ -254,8 +449,6 @@ public class JCRDataStorage {
       Node node = getNodeByPath(DEFAULT_PARENT_PATH + "/" + id, sProvider);
       node.remove();
       node.getSession().save();
-    } catch (PathNotFoundException pe) {
-        throw new BookNotFoundException(String.format("Book %s is not found", id));
     } catch (RepositoryException re) {
       log.error("Failed to delete book by id", re);
     } finally {
@@ -264,7 +457,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support delete all of book in workspace
+   * delete all of book in workspace
    */
   public void deleteAll() {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
@@ -272,8 +465,6 @@ public class JCRDataStorage {
       Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH, sProvider);
       parentNode.remove();
       parentNode.getSession().save();
-    } catch (PathNotFoundException pe) {
-      log.error("Failed to delete all book", pe);
     } catch (RepositoryException e) {
       log.error("Failed to delete all book", e);
     } finally {
@@ -282,7 +473,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support edit a exist book
+   * edit a exist book
    * 
    * @param book The book want to delete
    * @throws BookNotFoundException
@@ -305,7 +496,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support get all book in workspace 
+   * get all book in workspace 
    * 
    * @return List<Book>
    */
@@ -337,7 +528,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support search book by name(using SQL)
+   * search book by name(using SQL)
    * 
    * @param name The name of book
    * @return List<Book>
@@ -374,7 +565,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support search book by name(using XPath)
+   * search book by name(using XPath)
    * 
    * @param name The name of book
    * @return List<Book>
@@ -410,7 +601,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support search book by name with limit of result(using SQL)
+   * search book by name with limit of result(using SQL)
    * 
    * @param name The name of book
    * @return List<Book>
@@ -449,7 +640,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support search book by name with like condition(using SQL)
+   * search book by name with like condition(using SQL)
    * 
    * @param name The name of book
    * @return List<Book>
@@ -485,7 +676,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function support search book by name with like condition(using XPath)
+   * search book by name with like condition(using XPath)
    * 
    * @param name The name of book
    * @return List<Book>
@@ -521,7 +712,7 @@ public class JCRDataStorage {
   }
   
   /**
-   * The function check book exist by name
+   * check book exist by name
    * 
    * @param bookName The name of book
    * @param sProvider
@@ -545,6 +736,52 @@ public class JCRDataStorage {
       return iterator.hasNext();
     } catch (RepositoryException re) {
       log.error("Failed to check exist book name", re);
+      return false;
+    }
+  }
+  
+  /**
+   * check author exist by name
+   * 
+   * @param authorName
+   * @param sProvider
+   * @return
+   */
+  private boolean isExistAuthorName(String authorName, SessionProvider sProvider) {
+    authorName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_AUTHOR);
+    sb.append(" where " + BookNodeTypes.EXO_AUTHOR_NAME + " = '" + authorName + "'");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(sb.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      return nodes.hasNext();
+    } catch (RepositoryException re) {
+      log.error("Failed to check exist author name", re);
+      return false;
+    } 
+  }
+  
+  /**
+   * check user exist by name
+   * 
+   * @param username
+   * @param sProvider
+   * @return
+   */
+  private boolean isExistUserName(String username, SessionProvider sProvider) {
+    username.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    StringBuffer queryString = new StringBuffer("Select * from " + BookNodeTypes.EXO_USER);
+    queryString.append(" where " + BookNodeTypes.EXO_USER_NAME + " = '" + username + "'");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryString.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      return nodes.hasNext();
+    } catch (RepositoryException re) {
+      log.error("Failed to check exist user name", re);
       return false;
     }
   }
@@ -574,6 +811,7 @@ public class JCRDataStorage {
   }
   
   /**
+   * Create user by node data
    * 
    * @param node
    * @return
@@ -600,6 +838,7 @@ public class JCRDataStorage {
   }
   
   /**
+   * Create author by node data
    * 
    * @param node
    * @return

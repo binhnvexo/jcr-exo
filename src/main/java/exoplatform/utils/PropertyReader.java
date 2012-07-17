@@ -46,7 +46,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get property of node 
+   * get property of node 
    * and change to Double type 
    * 
    * @param name The name of node
@@ -58,7 +58,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get property of node 
+   * get property of node 
    * and change to Long type
    * 
    * @param name The name of node
@@ -70,7 +70,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get property of node
+   * get property of node
    * and change to String type
    * 
    * @param name The name of node
@@ -82,7 +82,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get property of node
+   * get property of node
    * and change to Date type
    * 
    * @param name The name of node
@@ -94,7 +94,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get property of node
+   * get property of node
    * and change to Boolean type
    * 
    * @param name The name of node
@@ -106,7 +106,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get value properties of node 
+   * get value properties of node 
    * and change to String array
    * 
    * @param name The name of node
@@ -118,7 +118,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get value properties of node
+   * get value properties of node
    * and change to List<String>
    * 
    * @param name The name of node
@@ -131,7 +131,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get value properties of node
+   * get value properties of node
    * and change to Set<String>
    * 
    * @param name The name of node
@@ -146,7 +146,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get value properties of node
+   * get value properties of node
    * and change to String array
    * 
    * @param values The array of value
@@ -162,7 +162,7 @@ public class PropertyReader {
   }
   
   /**
-   * The function get value properties of node
+   * get value properties of node
    * and return List<String>
    * @param values The Value array
    * @return List<String>
