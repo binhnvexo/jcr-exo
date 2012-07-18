@@ -16,7 +16,9 @@
  */
 package exoplatform;
 
-import junit.framework.TestCase;
+import org.exoplatform.services.organization.OrganizationService;
+
+import exoplatform.entity.User;
 
 /**
  * Created by The eXo Platform SAS
@@ -24,6 +26,32 @@ import junit.framework.TestCase;
  *          binhnv@exoplatform.com
  * Jul 17, 2012  
  */
-public class BookStoreTest extends TestCase {
+public class BookStoreTest extends BaseBookstoreTestCase {
 
+  private static BookStoreService service;
+  private static JCRDataStorage storage;
+  private OrganizationService organizationService;
+  
+  public BookStoreTest() throws Exception {
+    super();
+    service = (BookStoreService) container.getComponentInstanceOfType(BookStoreService.class);
+    storage = new JCRDataStorage(repositoryService);
+    organizationService = (OrganizationService) container.getComponentAdapterOfType(OrganizationService.class);
+  }
+  
+  /* (non-Javadoc)
+   * @see junit.framework.TestCase#setUp()
+   */
+  @Override
+  public void setUp() throws Exception {
+    super.setUp();
+  }
+  
+  public void testUserByNameSQL() {
+    String name = "BinhNV";
+    
+    User user = service.getUserByNameSQL(name);
+    assertNotNull(user);
+  }
+  
 }

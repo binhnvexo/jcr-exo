@@ -7,7 +7,7 @@
 	</component>
 	<component>
 	    <key>exoplatform.BookStoreService</key>
-	    <type>exoplatform.BookStoreService</type>
+	    <type>exoplatform.BookStoreServiceImpl</type>
     </component>
 
 </configuration>
