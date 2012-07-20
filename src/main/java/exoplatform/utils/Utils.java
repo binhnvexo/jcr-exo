@@ -16,7 +16,13 @@
  */
 package exoplatform.utils;
 
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+
+import exoplatform.BookNodeTypes;
+import exoplatform.entity.Author;
 import exoplatform.entity.Book;
+import exoplatform.entity.User;
 
 /**
  * Created by The eXo Platform SAS
@@ -68,6 +74,80 @@ public class Utils {
    */
   public static Book.CATEGORY bookCategoryStringToEnum(String category) {
     return category != null ? Book.CATEGORY.valueOf(category) : null;
+  }
+  
+  /**
+   * Create book by node data
+   * 
+   * @param node
+   * @return
+   * @throws RepositoryException
+   */
+  public static Book createBookByNode(Node node) throws RepositoryException {
+    if (node != null) {
+      Book book = new Book();
+      try {
+        book.setBookId(Integer.valueOf(node.getName()));
+      } catch (Exception e) {
+        return null;
+      }
+      PropertyReader reader = new PropertyReader(node);
+      book.setCategory(Utils.bookCategoryStringToEnum(reader.string(BookNodeTypes.EXO_BOOK_CATEGORY)));
+      book.setName(reader.string(BookNodeTypes.EXO_BOOK_NAME));
+      book.setContent(reader.string(BookNodeTypes.EXO_BOOK_CONTENT));
+      return book;
+    }
+    return null;
+  }
+  
+  /**
+   * Create user by node data
+   * 
+   * @param node
+   * @return
+   * @throws RepositoryException
+   */
+  public static User createUserByNode(Node node) throws RepositoryException {
+    if (node != null) {
+      User user = new User();
+      try {
+        user.setUserId(Integer.valueOf(node.getName()));
+      } catch (RepositoryException re) {
+        return null;
+      }
+      PropertyReader reader = new PropertyReader(node);
+      user.setUsername(reader.string(BookNodeTypes.EXO_USER_NAME));
+      user.setPassword(reader.string(BookNodeTypes.EXO_USER_PASSWORD));
+      user.setFullname(reader.string(BookNodeTypes.EXO_USER_FULLNAME));
+      user.setAddress(reader.string(BookNodeTypes.EXO_USER_ADDRESS));
+      user.setPhone(reader.string(BookNodeTypes.EXO_USER_PHONE));
+      return user;
+    }
+    return null;
+  }
+  
+  /**
+   * Create author by node data
+   * 
+   * @param node
+   * @return
+   * @throws RepositoryException
+   */
+  public static Author createAuthorByNode(Node node) throws RepositoryException {
+    if (node != null) {
+      Author author = new Author();
+      try {
+        author.setAuthorId(Integer.valueOf(node.getName()));
+      } catch (RepositoryException re) {
+        return null;
+      }
+      PropertyReader reader = new PropertyReader(node);
+      author.setName(reader.string(BookNodeTypes.EXO_AUTHOR_NAME));
+      author.setPhone(reader.string(BookNodeTypes.EXO_AUTHOR_PHONE));
+      author.setAddress(reader.string(BookNodeTypes.EXO_AUTHOR_ADDRESS));
+      return author;
+    }
+    return null;
   }
   
 }

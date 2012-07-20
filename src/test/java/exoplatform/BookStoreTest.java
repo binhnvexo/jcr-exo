@@ -16,11 +16,29 @@
  */
 package exoplatform;
 
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.MultivaluedMap;
+
 import junit.framework.TestCase;
 
 import org.exoplatform.container.StandaloneContainer;
+import org.exoplatform.container.component.RequestLifeCycle;
+import org.exoplatform.services.rest.ContainerResponseWriter;
+import org.exoplatform.services.rest.RequestHandler;
+import org.exoplatform.services.rest.impl.ContainerRequest;
+import org.exoplatform.services.rest.impl.ContainerResponse;
+import org.exoplatform.services.rest.impl.EnvironmentContext;
+import org.exoplatform.services.rest.impl.InputHeadersMap;
+import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
+import org.exoplatform.services.rest.impl.RequestHandlerImpl;
+import org.exoplatform.services.rest.tools.ByteArrayContainerResponseWriter;
 
 import exoplatform.entity.User;
+import exoplatform.exception.DuplicateBookException;
+import exoplatform.rest.BookStoreRestService;
 
 /**
  * Created by The eXo Platform SAS
@@ -30,8 +48,12 @@ import exoplatform.entity.User;
  */
 public class BookStoreTest extends TestCase {
   
+  private static BookStoreRestService restService;
   private static BookStoreService service;
   private static StandaloneContainer container;
+  private static RequestHandler requestHandler;
+  
+  static final String baseURI = "";
   
   static {
     initContainer();
@@ -47,6 +69,8 @@ public class BookStoreTest extends TestCase {
       StandaloneContainer.addConfigurationURL(configFile);
       container = StandaloneContainer.getInstance();
       service = (BookStoreService) container.getComponentInstanceOfType(BookStoreService.class);
+      requestHandler = (RequestHandler) container.getComponentInstanceOfType(RequestHandler.class);
+      restService = (BookStoreRestService) container.getComponentInstanceOfType(BookStoreRestService.class);
     } catch (Exception e) {
       throw new RuntimeException("fail to initialize container: " + e.getMessage(), e);
     }
@@ -111,5 +135,88 @@ public class BookStoreTest extends TestCase {
     User user = service.getUserByNameLimtXPath(name);
     assertNotNull(user);
   }
+  
+  /**
+   * add new author to datastorage
+   * 
+   * @param authorName
+   * @param authorAddress
+   * @param authorPhone
+   * @return
+   */
+  public void testAddAuthor() throws DuplicateBookException {
+    
+  }
+  
+  /**
+   * add new user
+   * 
+   * @param user
+   * @param nodes
+   * @return
+   * @throws DuplicateBookException
+   */
+  public void testAddUser() throws DuplicateBookException {
+    
+  }
+  
+  /**
+   * get user by name with sql statement
+   * 
+   * @param username
+   * @return
+   */
+  public void testWSGetUserByNameSQL() {
+    
+    String username = "binhnv";
+    String extURI = "/rest/private/bookstore/getUserByName/" + username;
+    
+    MultivaluedMap<String, String> values = new MultivaluedMapImpl();
+    values.putSingle("username", username);
+    ByteArrayContainerResponseWriter writer = new ByteArrayContainerResponseWriter();
+    try {
+      ContainerResponse response = service("GET", extURI, baseURI, values, null, writer);
+      System.out.println("+ ================================================= +");
+      System.out.println("+ ================ " + response.getEntity() + " ================ +");
+      System.out.println("+ ================================================= +");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+  }
+  
+  private ContainerResponse service(String method,
+                                    String requestURI,
+                                    String baseURI,
+                                    MultivaluedMap<String, String> headers,
+                                    byte[] data,
+                                    ContainerResponseWriter writer) throws Exception {
+     RequestLifeCycle.begin(container);
+     if (headers == null) {
+       headers = new MultivaluedMapImpl();
+     }
+
+     ByteArrayInputStream in = null;
+     if (data != null) {
+       in = new ByteArrayInputStream(data);
+     }
+
+     EnvironmentContext envctx = new EnvironmentContext();
+     HttpServletRequest httpRequest = new MockHttpServletRequest(in,
+                                                                 in != null ? in.available() : 0,
+                                                                 method,
+                                                                 new InputHeadersMap(headers));
+     envctx.put(HttpServletRequest.class, httpRequest);
+     EnvironmentContext.setCurrent(envctx);
+     ContainerRequest request = new ContainerRequest(method,
+                                                     new URI(requestURI),
+                                                     new URI(baseURI),
+                                                     in,
+                                                     new InputHeadersMap(headers));
+     ContainerResponse response = new ContainerResponse(writer);
+     requestHandler.handleRequest(request, response);
+     RequestLifeCycle.end();
+     return response;
+   }
   
 }

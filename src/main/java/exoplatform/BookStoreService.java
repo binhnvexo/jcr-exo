@@ -16,6 +16,8 @@
  */
 package exoplatform;
 
+import java.util.List;
+
 import javax.jcr.Node;
 
 import exoplatform.entity.User;
@@ -85,5 +87,34 @@ public interface BookStoreService {
    * @throws DuplicateBookException
    */
   public Node addBook(String bookName, CATEGORY category, String content, String nodePath) throws DuplicateBookException;
+  
+  /**
+   * add new author to datastorage
+   * 
+   * @param authorName
+   * @param authorAddress
+   * @param authorPhone
+   * @return
+   */
+  public Node addAuthor(String authorName, String authorAddress, String authorPhone) throws DuplicateBookException;
+  
+  /**
+   * add new user to datastorage
+   * 
+   * @param username
+   * @param password
+   * @param fullname
+   * @param address
+   * @param phone
+   * @param nodes
+   * @return
+   * @throws DuplicateBookException
+   */
+  public Node addUser(String username,
+                      String password,
+                      String fullname,
+                      String address,
+                      String phone,
+                      List<String> nodes) throws DuplicateBookException;
   
 }

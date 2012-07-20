@@ -9,5 +9,10 @@
 	    <key>exoplatform.BookStoreService</key>
 	    <type>exoplatform.BookStoreServiceImpl</type>
     </component>
+    
+	<component>
+		<key>exoplatform.rest.BookStoreRestService</key>
+    	<type>exoplatform.rest.BookStoreRestService</type>
+  	</component>
 
 </configuration>

@@ -136,7 +136,7 @@ public class JCRDataStorage {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_BOOK_PATH + "/" + id, sProvider);
-      return createBookByNode(node);
+      return Utils.createBookByNode(node);
     } catch (RepositoryException re) {
       log.error("Can not find this book", re);
       return null;
@@ -155,7 +155,7 @@ public class JCRDataStorage {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_USER_PATH + "/" + id, sProvider);
-      return createUserByNode(node);
+      return Utils.createUserByNode(node);
     } catch (RepositoryException re) {
       log.error("Can not find this user", re);
       return null;
@@ -174,7 +174,7 @@ public class JCRDataStorage {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH + "/" + id, sProvider);
-      return createAuthorByNode(node);
+      return Utils.createAuthorByNode(node);
     } catch (RepositoryException re) {
       log.error("Can not find this author", re);
       return null;
@@ -305,7 +305,7 @@ public class JCRDataStorage {
       NodeIterator nodes = result.getNodes();
       if (nodes.getSize() > 0) {
         Node node = nodes.nextNode();
-        return createUserByNode(node);
+        return Utils.createUserByNode(node);
       }
       return null;
     } catch (RepositoryException re) {
@@ -335,7 +335,7 @@ public class JCRDataStorage {
       NodeIterator nodes = result.getNodes();
       if (nodes.getSize() > 0) {
         Node node = nodes.nextNode();
-        return createUserByNode(node);
+        return Utils.createUserByNode(node);
       }
       return null;
     } catch (RepositoryException re) {
@@ -366,7 +366,7 @@ public class JCRDataStorage {
       if (nodes.getSize() > 0) {
         Node node = nodes.nextNode();
         PropertyReader reader = new PropertyReader(node);        
-        return createUserByNode(node);
+        return Utils.createUserByNode(node);
       }
       return null;
     } catch (RepositoryException re) {
@@ -397,7 +397,7 @@ public class JCRDataStorage {
       NodeIterator nodes = result.getNodes();
       if (nodes.getSize() > 0) {
         Node node = nodes.nextNode();
-        return createUserByNode(node);
+        return Utils.createUserByNode(node);
       }
       return null;
     } catch (RepositoryException re) {
@@ -426,7 +426,7 @@ public class JCRDataStorage {
       NodeIterator nodes = result.getNodes();
       if (nodes.getSize() > 0) {
         Node node = nodes.nextNode();
-        return createUserByNode(node);
+        return Utils.createUserByNode(node);
       }
       return null;
     } catch (RepositoryException re) {
@@ -516,7 +516,7 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        books.add(createBookByNode(node));
+        books.add(Utils.createBookByNode(node));
       }
       return books;
     } catch (RepositoryException re) {
@@ -552,7 +552,7 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        Book book = createBookByNode(node);
+        Book book = Utils.createBookByNode(node);
         books.add(book);
       }
       return books;
@@ -589,7 +589,7 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        books.add(createBookByNode(node));
+        books.add(Utils.createBookByNode(node));
       }
       return books;
     } catch (RepositoryException re) {
@@ -628,7 +628,7 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        books.add(createBookByNode(node));
+        books.add(Utils.createBookByNode(node));
       }
       return books;
     } catch (RepositoryException re) {
@@ -664,7 +664,7 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        books.add(createBookByNode(node));        
+        books.add(Utils.createBookByNode(node));        
       }
       return books;
     } catch (RepositoryException re) {
@@ -700,7 +700,7 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        books.add(createBookByNode(node));        
+        books.add(Utils.createBookByNode(node));        
       }
       return books;
     } catch (RepositoryException re) {
@@ -784,82 +784,6 @@ public class JCRDataStorage {
       log.error("Failed to check exist user name", re);
       return false;
     }
-  }
-  
-  /**
-   * Create book by node data
-   * 
-   * @param node
-   * @return
-   * @throws RepositoryException
-   */
-  private Book createBookByNode(Node node) throws RepositoryException {
-    if (node != null) {
-      Book book = new Book();
-      try {
-        book.setBookId(Integer.valueOf(node.getName()));
-      } catch (Exception e) {
-        return null;
-      }
-      PropertyReader reader = new PropertyReader(node);
-      book.setCategory(Utils.bookCategoryStringToEnum(reader.string(BookNodeTypes.EXO_BOOK_CATEGORY)));
-      book.setName(reader.string(BookNodeTypes.EXO_BOOK_NAME));
-      book.setContent(reader.string(BookNodeTypes.EXO_BOOK_CONTENT));
-      return book;
-    }
-    return null;
-  }
-  
-  /**
-   * Create user by node data
-   * 
-   * @param node
-   * @return
-   * @throws RepositoryException
-   */
-  private User createUserByNode(Node node) throws RepositoryException {
-    if (node != null) {
-      User user = new User();
-      try {
-        user.setUserId(Integer.valueOf(node.getName()));
-      } catch (RepositoryException re) {
-        log.error("Error in convert integer", re);
-        return null;
-      }
-      PropertyReader reader = new PropertyReader(node);
-      user.setUsername(reader.string(BookNodeTypes.EXO_USER_NAME));
-      user.setPassword(reader.string(BookNodeTypes.EXO_USER_PASSWORD));
-      user.setFullname(reader.string(BookNodeTypes.EXO_USER_FULLNAME));
-      user.setAddress(reader.string(BookNodeTypes.EXO_USER_ADDRESS));
-      user.setPhone(reader.string(BookNodeTypes.EXO_USER_PHONE));
-      return user;
-    }
-    return null;
-  }
-  
-  /**
-   * Create author by node data
-   * 
-   * @param node
-   * @return
-   * @throws RepositoryException
-   */
-  private Author createAuthorByNode(Node node) throws RepositoryException {
-    if (node != null) {
-      Author author = new Author();
-      try {
-        author.setAuthorId(Integer.valueOf(node.getName()));
-      } catch (RepositoryException re) {
-        log.error("Error in convert integer", re);
-        return null;
-      }
-      PropertyReader reader = new PropertyReader(node);
-      author.setName(reader.string(BookNodeTypes.EXO_AUTHOR_NAME));
-      author.setPhone(reader.string(BookNodeTypes.EXO_AUTHOR_PHONE));
-      author.setAddress(reader.string(BookNodeTypes.EXO_AUTHOR_ADDRESS));
-      return author;
-    }
-    return null;
   }
   
 }
