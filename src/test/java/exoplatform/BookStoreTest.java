@@ -18,6 +18,8 @@ package exoplatform;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MultivaluedMap;
@@ -33,10 +35,9 @@ import org.exoplatform.services.rest.impl.ContainerResponse;
 import org.exoplatform.services.rest.impl.EnvironmentContext;
 import org.exoplatform.services.rest.impl.InputHeadersMap;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
-import org.exoplatform.services.rest.impl.RequestHandlerImpl;
 import org.exoplatform.services.rest.tools.ByteArrayContainerResponseWriter;
 
-import exoplatform.entity.User;
+import exoplatform.entity.Book;
 import exoplatform.exception.DuplicateBookException;
 import exoplatform.rest.BookStoreRestService;
 
@@ -82,58 +83,13 @@ public class BookStoreTest extends TestCase {
   }
   
   /**
-   * create new database
+   * test search book by name function
    */
-  public void testCreateDB() {
-    service.createDB();
-  }
-  
-  /**
-   * get user by name with sql statement
-   * 
-   * @param username
-   * @return
-   */
-  public void testGetUserByNameSQL() {
-    String name = "binhnv";
-    User user = service.getUserByNameSQL(name);
-    assertNotNull(user);
-  }
-  
-  /**
-   * get user by name with xpath statement
-   * 
-   * @param username
-   * @return
-   */
-  public void testGetUserByNameXPath() {
-    String name = "binhnv";
-    User user = service.getUserByNameXPath(name);
-    assertNotNull(user);
-  }
-  
-  /**
-   * get user by name in range with sql statement
-   * 
-   * @param username
-   * @return
-   */
-  public void testGetUserByNameLimtSQL() {
-    String name = "binhnv";
-    User user = service.getUserByNameLimtSQL(name);
-    assertNotNull(user);
-  }
-  
-  /**
-   * get user by name in range with xpath statement
-   * 
-   * @param username
-   * @return
-   */
-  public void testGetUserByNameLimtXPath() {
-    String name = "binhnv";
-    User user = service.getUserByNameLimtXPath(name);
-    assertNotNull(user);
+  public void testSearchBookByName() {
+    String bookName = "";
+    List<Book> books = new ArrayList<Book>();
+    books = service.searchBookByName(bookName);
+    assertNotNull(books);
   }
   
   /**
@@ -176,9 +132,7 @@ public class BookStoreTest extends TestCase {
     ByteArrayContainerResponseWriter writer = new ByteArrayContainerResponseWriter();
     try {
       ContainerResponse response = service("GET", extURI, baseURI, values, null, writer);
-      System.out.println("+ ================================================= +");
-      System.out.println("+ ================ " + response.getEntity() + " ================ +");
-      System.out.println("+ ================================================= +");
+      assertNotNull(response.getEntity());
     } catch (Exception e) {
       e.printStackTrace();
     }

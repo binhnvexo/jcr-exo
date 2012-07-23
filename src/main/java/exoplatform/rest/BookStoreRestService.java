@@ -16,6 +16,9 @@
  */
 package exoplatform.rest;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.security.RolesAllowed;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -33,11 +36,10 @@ import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.services.rest.resource.ResourceContainer;
 
-import com.sun.corba.se.impl.javax.rmi.CORBA.Util;
-
 import exoplatform.BookStoreService;
 import exoplatform.entity.Author;
-import exoplatform.entity.User;
+import exoplatform.entity.Book;
+import exoplatform.entity.Book.CATEGORY;
 import exoplatform.exception.DuplicateBookException;
 import exoplatform.utils.Utils;
 
@@ -69,21 +71,41 @@ public class BookStoreRestService implements ResourceContainer {
   }
 
   /**
+   * get book by book name
+   * 
+   * @param bookName The name of book
+   * @return Response
+   */
+  @GET
+  @RolesAllowed("users")
+  @Path("/searchBookByName/{bookName}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response searchBookByName(@PathParam("bookName") String bookName) {
+    List<Book> books = new ArrayList<Book>();
+    books = service.searchBookByName(bookName);
+    if (books == null || books.size() <= 0) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    return Response.ok(books, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+  }
+  
+  /**
    * get user by name with sql statement
    * 
-   * @param username
+   * @param username The name of user
    * @return
    */
   @GET
   @RolesAllowed("users")
-  @Path("/getUserByName/{username}")
+  @Path("/searchBookByAuthor/{authorName}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response getUserByNameSQL(@PathParam("username") String username) {
-    User user = service.getUserByNameSQL(username);
-    if (user == null) {
+  public Response searchBookByAuthor(@PathParam("authorName") String authorName) {
+    List<Book> books = new ArrayList<Book>();
+    books = service.searchBookByAuthor(authorName);
+    if (books == null || books.size() <= 0) {
       return Response.status(Status.NO_CONTENT).build();
     }
-    return Response.ok(user, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+    return Response.ok(books, MediaType.APPLICATION_JSON).cacheControl(cc).build();
   }
   
   /**
@@ -96,23 +118,16 @@ public class BookStoreRestService implements ResourceContainer {
    */
   @POST
   @RolesAllowed("users")
-  @Path("/addAuthor")
+  @Path("/addAuthor/{authorName}/{authorAddress}/{authorPhone}")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response addAuthor(@PathParam("authorName")
-            String authorName, @PathParam("authorAddress")
-            String authorAddress, @PathParam("authorPhone")
-            String authorPhone) {
-    try {
-      Node authorNode = service.addAuthor(authorName, authorAddress, authorPhone);
-      Author author = Utils.createAuthorByNode(authorNode);
+  public Response addAuthor(@PathParam("authorName") String authorName, 
+                        @PathParam("authorAddress") String authorAddress, 
+                        @PathParam("authorPhone") String authorPhone) throws DuplicateBookException, RepositoryException {
+      Author author = Utils.createAuthorByNode(service.addAuthor(authorName, authorAddress, authorPhone));
+      if (author == null) {
+        return Response.status(Status.NO_CONTENT).build();
+      }
       return Response.ok(author, MediaType.APPLICATION_JSON).cacheControl(cc).build();
-    } catch (RepositoryException re) {
-      log.error("Can not add author", re);
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (DuplicateBookException de) {
-      log.error("Can not add author", de);
-      return Response.status(Status.BAD_REQUEST).build();
-    }
   }
   
 }

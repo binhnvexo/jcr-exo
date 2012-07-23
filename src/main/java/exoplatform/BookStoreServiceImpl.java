@@ -115,56 +115,6 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
   }
   
   /**
-   * get user by name with sql statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameSQL(String username) {
-    return jcrDataStorage.getUserByNameSQL(username);
-  }
-  
-  /**
-   * get user by name with xpath statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameXPath(String username) {
-    return jcrDataStorage.getUserByNameXPath(username);
-  }
-  
-  /**
-   * get user by name in range with sql statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameLimtSQL(String username) {
-    return jcrDataStorage.getUserByNameLimtSQL(username);
-  }
-  
-  /**
-   * get user by name in range with xpath statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameLimtXPath(String username) {
-    return jcrDataStorage.getUserByNameLimtXPath(username);
-  }
-  
-  /**
-   * get user by book name with sql statement
-   * 
-   * @param bookName
-   * @return
-   */
-  public User getUserByBookQuery(String bookName) {
-    return jcrDataStorage.getUserByBookQuery(bookName);
-  }
-  
-  /**
    * add new book to datastorage
    * 
    * @param bookName
@@ -209,53 +159,23 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
   }
   
   /**
-   * search book by name(using SQL)
+   * search book by book name
    * 
-   * @param name The name of book
-   * @return
+   * @param bookName The name of book
+   * @return List<Book> The list of book
    */
-  public List<Book> searchBookByNameSQL(String name) {
-    return jcrDataStorage.searchBookByNameSQL(name);
+  public List<Book> searchBookByName(String bookName) {
+    return jcrDataStorage.searchBookByName(bookName);
   }
   
   /**
-   * search book by name(using XPath)
+   * search book by author name
    * 
-   * @param name The name of book
-   * @return
+   * @param authorName The name of author
+   * @return List<Book> The list of book
    */
-  public List<Book> searchBookByNameXPath(String name) {
-    return jcrDataStorage.searchBookByNameXPath(name);
-  }
-  
-  /**
-   * search book by name but limit amount of records(using SQL)
-   * 
-   * @param name The name of book
-   * @return
-   */
-  public List<Book> searchBookByNameLimitSQL(String name) {
-    return jcrDataStorage.searchBookByNameLimitSQL(name);
-  }
-  
-  /**
-   * search book by name with like condition(using SQL)
-   * 
-   * @param name The name of book
-   * @return
-   */
-  public List<Book> searchBookByNameLikeSQL(String name) {
-    return jcrDataStorage.searchBookByNameLikeSQL(name);
-  }
-  
-  /**
-   * search book by name with like condition(using XPath)
-   * 
-   * @param name The name of book
-   * @return
-   */
-  public List<Book> searchBookByNameLikeXPath(String name) {
-    return jcrDataStorage.searchBookByNameLikeSQL(name);
+  public List<Book> searchBookByAuthor(String authorName) {
+    return jcrDataStorage.searchBookByAuthor(authorName);
   }
   
   /**

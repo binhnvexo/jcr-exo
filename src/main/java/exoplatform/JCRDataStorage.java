@@ -231,7 +231,8 @@ public class JCRDataStorage {
     if (isExistAuthorName(author.getName(), sProvider)) {
       throw new DuplicateBookException(String.format("Author %s is existed", author.getName()));
     }
-    author.setAuthorId(Utils.authorId++);
+//    author.setAuthorId(Utils.authorId++);
+    author.setAuthorId(6);
     try {
       Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH, sProvider);
       Node authorNode = parentNode.addNode("" + author.getAuthorId(), BookNodeTypes.EXO_AUTHOR);
@@ -528,17 +529,17 @@ public class JCRDataStorage {
   }
   
   /**
-   * search book by name(using SQL)
+   * search book by book name
    * 
-   * @param name The name of book
-   * @return List<Book>
+   * @param bookName The name of book
+   * @return List<Book> The list of book
    */
-  public List<Book> searchBookByNameSQL(String name) {
+  public List<Book> searchBookByName(String bookName) {
     /* replace "" sign and - sign */
-    name = name.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    bookName = bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
     /* create query string */
     StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_BOOK);
-    sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " = '" + name + "'");
+    sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " = '" + bookName + "'");
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       /* create QueryManager from session */
@@ -565,23 +566,67 @@ public class JCRDataStorage {
   }
   
   /**
-   * search book by name(using XPath)
+   * search book by author name
    * 
-   * @param name The name of book
-   * @return List<Book>
+   * @param authorName The name of author
+   * @return List<Book> The list of book
    */
-  public List<Book> searchBookByNameXPath(String name) {
-    /* replace "" sign and - sign */
-    name = name.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
-    /* create query string */
-    StringBuffer sb = new StringBuffer("//element(*," + BookNodeTypes.EXO_BOOK + ")[@"
-        + BookNodeTypes.EXO_BOOK_NAME + "='" + name + "']/@" + BookNodeTypes.EXO_BOOK_NAME);
+  public List<Book> searchBookByAuthor(String authorName) {
+    authorName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    authorName = authorName.trim();
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
+      Node node = searchAuthorByName(authorName);
+      String uuid = "";
+      if (node != null) {
+        uuid = node.getUUID();
+      }
+      StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_BOOK);
+      sb.append(" where " + BookNodeTypes.EXO_AUTHOR + " like '%" + uuid + "%'");
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(sb.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      List<Book> books = new ArrayList<Book>();
+      while (nodes.hasNext()) {
+        Node n = nodes.nextNode();
+        Book book = new Book();
+        book = Utils.createBookByNode(n);
+        books.add(book);
+      }
+      return books;
+    } catch (RepositoryException re) {
+      log.error("Can not find book", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * search book by book name
+   * 
+   * @param bookName The name of book
+   * @param username The name of user
+   * @return List<Book> The list of book
+   */
+  public List<Book> searchBookByNameWithUser(String bookName, String username) {
+    /* replace "" sign and - sign */
+    bookName = bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    bookName = bookName.trim();
+    /* replace "" sign and - sign */
+    username = username.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    username = username.trim();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      
+      /* create query string */
+      StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_BOOK);
+      sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " = '" + bookName + "'");
       /* create QueryManager from session */
       QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
       /* create Query object */
-      Query query = queryManager.createQuery(sb.toString(), Query.XPATH);
+      Query query = queryManager.createQuery(sb.toString(), Query.SQL);
       /* execute query and return result to QueryResult */
       QueryResult result = query.execute();
       /* transfer data to NodeIterator */
@@ -589,11 +634,72 @@ public class JCRDataStorage {
       List<Book> books = new ArrayList<Book>();
       while (nodes.hasNext()) {
         Node node = nodes.nextNode();
-        books.add(Utils.createBookByNode(node));
+        Book book = Utils.createBookByNode(node);
+        books.add(book);
       }
       return books;
     } catch (RepositoryException re) {
       log.error("Can not find book", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * search author by author name
+   * 
+   * @param authorName The name of author
+   * @return Node The node author
+   */
+  private Node searchAuthorByName(String authorName) {
+    authorName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    authorName = authorName.trim();
+    StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_AUTHOR);
+    sb.append(" where " + BookNodeTypes.EXO_AUTHOR_NAME + " like '%" + authorName + "%'");
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(sb.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return node;
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not find book", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * search author by author name
+   * 
+   * @param authorName The name of author
+   * @return Node The node author
+   */
+  private Node searchUserByName(String username) {
+    username.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    username = username.trim();
+    StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_USER);
+    sb.append(" where " + BookNodeTypes.EXO_USER_NAME + " like '%" + username + "%'");
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(sb.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return node;
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not find user", re);
       return null;
     } finally {
       sProvider.close();

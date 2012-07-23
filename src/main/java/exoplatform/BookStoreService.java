@@ -20,6 +20,8 @@ import java.util.List;
 
 import javax.jcr.Node;
 
+import exoplatform.entity.Author;
+import exoplatform.entity.Book;
 import exoplatform.entity.User;
 import exoplatform.entity.Book.CATEGORY;
 import exoplatform.exception.DuplicateBookException;
@@ -33,49 +35,20 @@ import exoplatform.exception.DuplicateBookException;
 public interface BookStoreService {
 
   /**
-   * create new database
+   * search book by book name
+   * 
+   * @param bookName The name of book
+   * @return List<Book> The list of book
    */
-  public void createDB();
+  public List<Book> searchBookByName(String bookName);
   
   /**
-   * get user by name with sql statement
+   * search book by author name
    * 
-   * @param username
-   * @return
+   * @param authorName The name of author
+   * @return List<Book> The list of book
    */
-  public User getUserByNameSQL(String username);
-  
-  /**
-   * get user by name with xpath statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameXPath(String username);
-  
-  /**
-   * get user by name in range with sql statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameLimtSQL(String username);
-  
-  /**
-   * get user by name in range with xpath statement
-   * 
-   * @param username
-   * @return
-   */
-  public User getUserByNameLimtXPath(String username);
-  
-  /**
-   * get user by book name with sql statement
-   * 
-   * @param bookName
-   * @return
-   */
-  public User getUserByBookQuery(String bookName);
+  public List<Book> searchBookByAuthor(String authorName);
   
   /**
    * add new book to datastorage
