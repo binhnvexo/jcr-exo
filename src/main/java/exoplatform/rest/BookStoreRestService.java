@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
-import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -39,7 +41,7 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import exoplatform.BookStoreService;
 import exoplatform.entity.Author;
 import exoplatform.entity.Book;
-import exoplatform.entity.Book.CATEGORY;
+import exoplatform.exception.BookNotFoundException;
 import exoplatform.exception.DuplicateBookException;
 import exoplatform.utils.Utils;
 
@@ -118,16 +120,60 @@ public class BookStoreRestService implements ResourceContainer {
    */
   @POST
   @RolesAllowed("users")
-  @Path("/addAuthor/{authorName}/{authorAddress}/{authorPhone}")
+  @Path("/addAuthor")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response addAuthor(@PathParam("authorName") String authorName, 
-                        @PathParam("authorAddress") String authorAddress, 
-                        @PathParam("authorPhone") String authorPhone) throws DuplicateBookException, RepositoryException {
+  public Response addAuthor(@FormParam("authorName") String authorName, 
+                            @FormParam("authorAddress") String authorAddress, 
+                            @FormParam("authorPhone") String authorPhone) throws DuplicateBookException, RepositoryException {
       Author author = Utils.createAuthorByNode(service.addAuthor(authorName, authorAddress, authorPhone));
       if (author == null) {
         return Response.status(Status.NO_CONTENT).build();
       }
       return Response.ok(author, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+  }
+  
+  /**
+   * delete author from datastorage
+   * 
+   * @param authorName
+   * @param authorAddress
+   * @param authorPhone
+   * @return
+   */
+  @DELETE
+  @RolesAllowed("users")
+  @Path("/deleteAuthor")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response deleteAuthor(@FormParam("authorName") String authorName) throws BookNotFoundException, RepositoryException {
+    try {
+      service.deleteAuthor(authorName);
+      return Response.ok().cacheControl(cc).build();
+    } catch (Exception e) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+  }
+  
+  /**
+   * delete author from datastorage
+   * 
+   * @param authorName
+   * @param authorAddress
+   * @param authorPhone
+   * @return
+   */
+  @PUT
+  @RolesAllowed("users")
+  @Path("/editAuthor")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response editAuthor(@FormParam("authorName") String authorName, 
+                             @FormParam("authorAddress") String authorAddress, 
+                             @FormParam("authorPhone") String authorPhone ) throws BookNotFoundException, RepositoryException {
+    try {
+      service.editAuthor(new Author(authorName, authorAddress, authorPhone));
+      return Response.ok().cacheControl(cc).build();
+    } catch (Exception e) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
   }
   
 }

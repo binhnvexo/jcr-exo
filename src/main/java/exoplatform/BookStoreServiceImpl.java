@@ -32,6 +32,7 @@ import exoplatform.entity.Author;
 import exoplatform.entity.Book;
 import exoplatform.entity.Book.CATEGORY;
 import exoplatform.entity.User;
+import exoplatform.exception.BookNotFoundException;
 import exoplatform.exception.DuplicateBookException;
 
 /**
@@ -190,6 +191,26 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
       return book;
     }
     return jcrDataStorage.getBook(id);
+  }
+
+  /**
+   * delete a author by authorName
+   * 
+   * @param authorName The name of author
+   * @throws BookNotFoundException
+   */
+  public void deleteAuthor(String authorName) throws BookNotFoundException {
+    jcrDataStorage.deleteAuthor(authorName);
+  }
+
+  /**
+   * edit a exist book
+   * 
+   * @param book The book want to delete
+   * @throws BookNotFoundException
+   */
+  public void editAuthor(Author author) throws BookNotFoundException {
+    jcrDataStorage.editAuthor(author);
   }
 
 }

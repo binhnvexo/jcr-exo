@@ -22,8 +22,8 @@ import javax.jcr.Node;
 
 import exoplatform.entity.Author;
 import exoplatform.entity.Book;
-import exoplatform.entity.User;
 import exoplatform.entity.Book.CATEGORY;
+import exoplatform.exception.BookNotFoundException;
 import exoplatform.exception.DuplicateBookException;
 
 /**
@@ -89,5 +89,21 @@ public interface BookStoreService {
                       String address,
                       String phone,
                       List<String> nodes) throws DuplicateBookException;
+  
+  /**
+   * delete a author by authorName
+   * 
+   * @param authorName The name of author
+   * @throws BookNotFoundException
+   */
+  public void deleteAuthor(String authorName) throws BookNotFoundException;
+  
+  /**
+   * edit a exist book
+   * 
+   * @param book The book want to delete
+   * @throws BookNotFoundException
+   */
+  public void editAuthor(Author author) throws BookNotFoundException;
   
 }

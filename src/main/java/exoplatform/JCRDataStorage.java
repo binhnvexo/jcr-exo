@@ -232,7 +232,7 @@ public class JCRDataStorage {
       throw new DuplicateBookException(String.format("Author %s is existed", author.getName()));
     }
 //    author.setAuthorId(Utils.authorId++);
-    author.setAuthorId(6);
+    author.setAuthorId(7);
     try {
       Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH, sProvider);
       Node authorNode = parentNode.addNode("" + author.getAuthorId(), BookNodeTypes.EXO_AUTHOR);
@@ -458,6 +458,26 @@ public class JCRDataStorage {
   }
   
   /**
+   * delete a author by authorName
+   * 
+   * @param authorName The name of author
+   * @throws BookNotFoundException
+   */
+  public void deleteAuthor(String authorName) throws BookNotFoundException {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Node authorNode = searchAuthorByName(authorName);
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH + "/" + authorNode.getName(), sProvider);
+      node.remove();
+      node.getSession().save();
+    } catch (RepositoryException re) {
+      log.error("Failed to delete book by id", re);
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
    * delete all of book in workspace
    */
   public void deleteAll() {
@@ -491,6 +511,36 @@ public class JCRDataStorage {
     } catch (RepositoryException re) {
       log.error(String.format("Book %s is not found", book.getBookId()), re);
       throw new BookNotFoundException(String.format("Book %s is not found", book.getBookId()));
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * edit a exist book
+   * 
+   * @param book The book want to delete
+   * @throws BookNotFoundException
+   */
+  public void editAuthor(Author author) throws BookNotFoundException {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Node authorNode = searchAuthorByName(author.getName());
+      /* execute modify data and set to workspace */
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_AUTHOR_PATH + "/" + authorNode.getName(), sProvider);
+      if (!StringUtils.isEmpty(author.getName())) {
+        node.setProperty(BookNodeTypes.EXO_AUTHOR_NAME, author.getName());
+      }
+      if (!StringUtils.isEmpty(author.getAddress())) {
+        node.setProperty(BookNodeTypes.EXO_AUTHOR_ADDRESS, author.getAddress());
+      }
+      if (!StringUtils.isEmpty(author.getPhone())) {
+        node.setProperty(BookNodeTypes.EXO_AUTHOR_PHONE, author.getPhone());
+      }
+      node.getSession().save();
+    } catch (RepositoryException re) {
+      log.error(String.format("Author %s is not found", author.getName()), re);
+      throw new BookNotFoundException(String.format("Author %s is not found", author.getName()));
     } finally {
       sProvider.close();
     }
@@ -535,11 +585,13 @@ public class JCRDataStorage {
    * @return List<Book> The list of book
    */
   public List<Book> searchBookByName(String bookName) {
-    /* replace "" sign and - sign */
-    bookName = bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
     /* create query string */
     StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_BOOK);
-    sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " = '" + bookName + "'");
+    if (!StringUtils.isEmpty(bookName)) {
+      /* replace "" sign and - sign */
+      bookName = bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+      sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " = '" + bookName + "'");
+    }
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       /* create QueryManager from session */
