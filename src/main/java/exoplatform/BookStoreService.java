@@ -59,7 +59,7 @@ public interface BookStoreService {
    * @return
    * @throws DuplicateBookException
    */
-  public Node addBook(String bookName, CATEGORY category, String content, String nodePath) throws DuplicateBookException;
+  public Node addBook(Book book, String authorId) throws DuplicateBookException;
   
   /**
    * add new author to datastorage
@@ -87,8 +87,7 @@ public interface BookStoreService {
                       String password,
                       String fullname,
                       String address,
-                      String phone,
-                      List<String> nodes) throws DuplicateBookException;
+                      String phone) throws DuplicateBookException;
   
   /**
    * delete a author by authorName
@@ -96,7 +95,7 @@ public interface BookStoreService {
    * @param authorName The name of author
    * @throws BookNotFoundException
    */
-  public void deleteAuthor(String authorName) throws BookNotFoundException;
+  public void deleteAuthor(String authorId) throws BookNotFoundException;
   
   /**
    * edit a exist book
@@ -105,5 +104,7 @@ public interface BookStoreService {
    * @throws BookNotFoundException
    */
   public void editAuthor(Author author) throws BookNotFoundException;
+  
+  public Node addUserReference(String userId, String bookId) throws DuplicateBookException;
   
 }

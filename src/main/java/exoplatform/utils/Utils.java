@@ -87,7 +87,7 @@ public class Utils {
     if (node != null) {
       Book book = new Book();
       try {
-        book.setBookId(Integer.valueOf(node.getName()));
+        book.setBookId(node.getName());
       } catch (Exception e) {
         return null;
       }
@@ -111,7 +111,7 @@ public class Utils {
     if (node != null) {
       User user = new User();
       try {
-        user.setUserId(Integer.valueOf(node.getName()));
+        user.setUserId(node.getName());
       } catch (RepositoryException re) {
         return null;
       }
@@ -137,7 +137,7 @@ public class Utils {
     if (node != null) {
       Author author = new Author();
       try {
-        author.setAuthorId(Integer.valueOf(node.getName()));
+        author.setAuthorId(node.getName());
       } catch (RepositoryException re) {
         return null;
       }

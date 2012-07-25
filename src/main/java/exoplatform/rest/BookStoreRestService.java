@@ -41,6 +41,8 @@ import org.exoplatform.services.rest.resource.ResourceContainer;
 import exoplatform.BookStoreService;
 import exoplatform.entity.Author;
 import exoplatform.entity.Book;
+import exoplatform.entity.Book.CATEGORY;
+import exoplatform.entity.User;
 import exoplatform.exception.BookNotFoundException;
 import exoplatform.exception.DuplicateBookException;
 import exoplatform.utils.Utils;
@@ -133,6 +135,55 @@ public class BookStoreRestService implements ResourceContainer {
   }
   
   /**
+   * add new user to datastorage
+   * 
+   * @param username
+   * @param password
+   * @param fullname
+   * @param address
+   * @return
+   */
+  @POST
+  @RolesAllowed("users")
+  @Path("/addUser")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response addUser(@FormParam("username") String username,
+                          @FormParam("password") String password,
+                          @FormParam("fullname") String fullname,
+                          @FormParam("address") String address,
+                          @FormParam("phone") String phone) throws DuplicateBookException, RepositoryException {
+    User user = Utils.createUserByNode(service.addUser(username, password, fullname, address, phone));
+    if (user == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    return Response.ok(user, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+  }
+  
+  /**
+   * add new book to datastorage
+   * 
+   * @param bookName
+   * @param category
+   * @param content
+   * @param authorId
+   * @return
+   */
+  @POST
+  @RolesAllowed("users")
+  @Path("/addBook")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response addBook(@FormParam("bookName") String bookName, 
+                      @FormParam("category") CATEGORY category, 
+                      @FormParam("content") String content, 
+                      @FormParam("authorId") String authorId) throws DuplicateBookException, RepositoryException {
+    Book book = Utils.createBookByNode(service.addBook(new Book(bookName, category, content), authorId));
+    if (book == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    return Response.ok(book, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+  }
+  
+  /**
    * delete author from datastorage
    * 
    * @param authorName
@@ -144,9 +195,9 @@ public class BookStoreRestService implements ResourceContainer {
   @RolesAllowed("users")
   @Path("/deleteAuthor")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response deleteAuthor(@FormParam("authorName") String authorName) throws BookNotFoundException, RepositoryException {
+  public Response deleteAuthor(@FormParam("authorId") String authorId) throws BookNotFoundException, RepositoryException {
     try {
-      service.deleteAuthor(authorName);
+      service.deleteAuthor(authorId);
       return Response.ok().cacheControl(cc).build();
     } catch (Exception e) {
       return Response.status(Status.NO_CONTENT).build();
@@ -165,13 +216,33 @@ public class BookStoreRestService implements ResourceContainer {
   @RolesAllowed("users")
   @Path("/editAuthor")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response editAuthor(@FormParam("authorName") String authorName, 
+  public Response editAuthor(@FormParam("authorId") String authorId,
+                             @FormParam("authorName") String authorName, 
                              @FormParam("authorAddress") String authorAddress, 
                              @FormParam("authorPhone") String authorPhone ) throws BookNotFoundException, RepositoryException {
     try {
-      service.editAuthor(new Author(authorName, authorAddress, authorPhone));
+      Author author = new Author();
+      author.setAuthorId(authorId);
+      author.setName(authorName);
+      author.setAddress(authorAddress);
+      author.setPhone(authorPhone);
+      service.editAuthor(author);
       return Response.ok().cacheControl(cc).build();
     } catch (Exception e) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+  }
+  
+  @PUT
+  @RolesAllowed("users")
+  @Path("/addUserReference")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response addUserReference(@FormParam("userId") String userId, 
+                               @FormParam("bookId") String bookId) {
+    try {
+      service.addUserReference(userId, bookId);
+      return Response.ok().cacheControl(cc).build();
+    } catch (DuplicateBookException de) {
       return Response.status(Status.NO_CONTENT).build();
     }
   }

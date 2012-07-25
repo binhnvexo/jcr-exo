@@ -30,7 +30,7 @@ public class Book {
     NOVEL, MANGA, COMICS, TECHNICAL, MATHS, HISTORY
   }
   /* id of book */
-  private int bookId;
+  private String bookId;
   /* name of book */
   private String name;
   /*category of book*/
@@ -60,18 +60,7 @@ public class Book {
     this.content = content;
   }
   
-  /**
-   * @return the id
-   */
-  public int getBookId() {
-    return bookId;
-  }
-  /**
-   * @param id the id to set
-   */
-  public void setBookId(int bookId) {
-    this.bookId = bookId;
-  }
+  
   /**
    * @return the name
    */
@@ -107,6 +96,20 @@ public class Book {
    */
   public void setContent(String content) {
     this.content = content;
+  }
+
+  /**
+   * @return the bookId
+   */
+  public String getBookId() {
+    return bookId;
+  }
+
+  /**
+   * @param bookId the bookId to set
+   */
+  public void setBookId(String bookId) {
+    this.bookId = bookId;
   }
   
 }

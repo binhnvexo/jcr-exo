@@ -24,7 +24,7 @@ package exoplatform.entity;
  */
 public class Author {
 
-  private int authorId;
+  private String authorId;
   private String name;
   private String address;
   private String phone;
@@ -47,20 +47,6 @@ public class Author {
     this.name = name;
     this.address = address;
     this.phone = phone;
-  }
-
-  /**
-   * @return the id
-   */
-  public int getAuthorId() {
-    return authorId;
-  }
-
-  /**
-   * @param id the id to set
-   */
-  public void setAuthorId(int authorId) {
-    this.authorId = authorId;
   }
 
   /**
@@ -103,6 +89,20 @@ public class Author {
    */
   public void setPhone(String phone) {
     this.phone = phone;
+  }
+
+  /**
+   * @return the authorId
+   */
+  public String getAuthorId() {
+    return authorId;
+  }
+
+  /**
+   * @param authorId the authorId to set
+   */
+  public void setAuthorId(String authorId) {
+    this.authorId = authorId;
   }
 
 }

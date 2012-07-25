@@ -122,13 +122,36 @@ public class BookStoreTest extends TestCase {
    * @param username
    * @return
    */
-  public void testWSGetUserByNameSQL() {
+  public void testWSSearchBookByName() {
     
     String username = "binhnv";
-    String extURI = "/rest/private/bookstore/getUserByName/" + username;
+    String extURI = "/rest/private/bookstore/searchBookByName/" + username;
     
     MultivaluedMap<String, String> values = new MultivaluedMapImpl();
     values.putSingle("username", username);
+    ByteArrayContainerResponseWriter writer = new ByteArrayContainerResponseWriter();
+    try {
+      ContainerResponse response = service("GET", extURI, baseURI, values, null, writer);
+      assertNotNull(response.getEntity());
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+  }
+  
+  /**
+   * get user by name with sql statement
+   * 
+   * @param username
+   * @return
+   */
+  public void testWSSearchBookByAuthor() {
+    
+    String authorName = "Mario%20Puzzo";
+    String extURI = "/rest/private/bookstore/searchBookByAuthor/" + authorName;
+    
+    MultivaluedMap<String, String> values = new MultivaluedMapImpl();
+    values.putSingle("authorName", authorName);
     ByteArrayContainerResponseWriter writer = new ByteArrayContainerResponseWriter();
     try {
       ContainerResponse response = service("GET", extURI, baseURI, values, null, writer);

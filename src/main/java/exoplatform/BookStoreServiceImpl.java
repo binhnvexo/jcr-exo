@@ -17,7 +17,6 @@
 package exoplatform;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.jcr.Node;
@@ -90,24 +89,26 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
       Node authorNode5 = addAuthor("Ma Van Khang", "Vietnam", "23451234");
       Node authorNode6 = addAuthor("Victor Huygo", "France", "8760985544");
       
-      Node bookNode1 = addBook("Shelock Holme", CATEGORY.NOVEL, "The sign of the Four", authorNode1.getPath());
-      Node bookNode2 = addBook("Harry Porter", CATEGORY.NOVEL, "Alice in wonder land", authorNode2.getPath());
-      Node bookNode3 = addBook("Seal team six", CATEGORY.NOVEL, "Seal team six", authorNode3.getPath());
-      Node bookNode4 = addBook("Hibernate in action", CATEGORY.TECHNICAL, "Hibernate", authorNode4.getPath());
-      Node bookNode5 = addBook("Napoleon", CATEGORY.HISTORY, "Napoleon", authorNode5.getPath());
-      Node bookNode6 = addBook("Jouney to the West", CATEGORY.COMICS, "Jouney to the West", authorNode6.getPath());
+      Book book = new Book("Shelock Holme", CATEGORY.NOVEL, "The sign of the Four");
+      Node bookNode1 = addBook(book, authorNode1.getPath());
+      book = new Book("Harry Porter", CATEGORY.NOVEL, "Alice in wonder land");
+      Node bookNode2 = addBook(book, authorNode2.getPath());
+      book = new Book("Seal team six", CATEGORY.NOVEL, "Seal team six");
+      Node bookNode3 = addBook(book, authorNode3.getPath());
+      book = new Book("Hibernate in action", CATEGORY.TECHNICAL, "Hibernate");
+      Node bookNode4 = addBook(book, authorNode4.getPath());
+      book = new Book("Napoleon", CATEGORY.HISTORY, "Napoleon");
+      Node bookNode5 = addBook(book, authorNode5.getPath());
+      book = new Book("Jouney to the West", CATEGORY.COMICS, "Jouney to the West");
+      Node bookNode6 = addBook(book, authorNode6.getPath());
       
-      List<String> nodes1 = new ArrayList<String>();
-      nodes1.add(bookNode1.getPath());
-      nodes1.add(bookNode2.getPath());
-      nodes1.add(bookNode3.getPath());
-      Node userNode1 = addUser("binhnv", "12345", "Nguyen Vinh Binh", "Hanoi", "123456789", nodes1);
+      Node userNode1 = addUser("binhnv", "12345", "Nguyen Vinh Binh", "Hanoi", "123456789");
+//      addUserReference(userNode1.getName(), bookNode1.getName());
+//      addUserReference(userNode1.getName(), bookNode3.getName());
+      Node userNode2 = addUser("huongdt", "54321", "Doan Thu Huong", "Hanoi", "987654321");
+//      addUserReference(userNode2.getName(), bookNode2.getName());
+//      addUserReference(userNode1.getName(), bookNode4.getName());
       
-      List<String> nodes2 = new ArrayList<String>();
-      nodes2.add(bookNode5.getPath());
-      nodes2.add(bookNode6.getPath());
-      nodes2.add(bookNode1.getPath());
-      Node userNode2 = addUser("huongdt", "54321", "Doan Thu Huong", "Hanoi", "987654321", nodes2);
     } catch (DuplicateBookException e) {
       e.printStackTrace();
     } catch (RepositoryException e) {
@@ -124,9 +125,8 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
    * @return
    * @throws DuplicateBookException
    */
-  public Node addBook(String bookName, CATEGORY category, String content, String nodePath) throws DuplicateBookException {
-    Book book = new Book(bookName, category, content);
-    return jcrDataStorage.addBook(book, nodePath);
+  public Node addBook(Book book, String authorId) throws DuplicateBookException {
+    return jcrDataStorage.addBook(book, authorId);
   }
   
   /**
@@ -154,9 +154,9 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
    * @return
    * @throws DuplicateBookException
    */
-  public Node addUser(String username, String password, String fullname, String address, String phone, List<String> nodes) throws DuplicateBookException {
+  public Node addUser(String username, String password, String fullname, String address, String phone) throws DuplicateBookException {
     User user = new User(username, password, fullname, address, phone);
-    return jcrDataStorage.addUser(user, nodes);
+    return jcrDataStorage.addUser(user);
   }
   
   /**
@@ -199,8 +199,8 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
    * @param authorName The name of author
    * @throws BookNotFoundException
    */
-  public void deleteAuthor(String authorName) throws BookNotFoundException {
-    jcrDataStorage.deleteAuthor(authorName);
+  public void deleteAuthor(String authorId) throws BookNotFoundException {
+    jcrDataStorage.deleteAuthor(authorId);
   }
 
   /**
@@ -213,4 +213,8 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
     jcrDataStorage.editAuthor(author);
   }
 
+  public Node addUserReference(String userId, String bookId) throws DuplicateBookException {
+    return jcrDataStorage.addUserReference(userId, bookId);
+  }
+  
 }

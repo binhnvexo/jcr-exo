@@ -24,7 +24,7 @@ package exoplatform.entity;
  */
 public class User {
 
-  private int userId;
+  private String userId;
   private String username;
   private String password;
   private String fullname;
@@ -53,20 +53,6 @@ public class User {
     this.fullname = fullname;
     this.address = address;
     this.phone = phone;
-  }
-
-  /**
-   * @return the userId
-   */
-  public int getUserId() {
-    return userId;
-  }
-
-  /**
-   * @param userId the userId to set
-   */
-  public void setUserId(int userId) {
-    this.userId = userId;
   }
 
   /**
@@ -137,6 +123,20 @@ public class User {
    */
   public void setPhone(String phone) {
     this.phone = phone;
+  }
+
+  /**
+   * @return the userId
+   */
+  public String getUserId() {
+    return userId;
+  }
+
+  /**
+   * @param userId the userId to set
+   */
+  public void setUserId(String userId) {
+    this.userId = userId;
   }
 
 }
