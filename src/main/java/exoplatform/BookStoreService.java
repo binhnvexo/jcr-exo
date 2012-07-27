@@ -107,4 +107,9 @@ public interface BookStoreService {
   
   public Node addUserReference(String userId, String bookId) throws DuplicateBookException;
   
+  /**
+   * get all book exist in datastore
+   */
+  public List<Book> getAllBook();
+  
 }

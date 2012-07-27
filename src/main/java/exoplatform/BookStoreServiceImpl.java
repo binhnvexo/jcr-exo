@@ -217,4 +217,11 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
     return jcrDataStorage.addUserReference(userId, bookId);
   }
   
+  /**
+   * get all book exist in datastore
+   */
+  public List<Book> getAllBook() {
+    return jcrDataStorage.getAllBook();
+  }
+  
 }

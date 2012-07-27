@@ -75,6 +75,22 @@ public class BookStoreRestService implements ResourceContainer {
   }
 
   /**
+   * get all book exist in datastore
+   */
+  @GET
+  @RolesAllowed("users")
+  @Path("/searchAllBook")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response searchAllBook(){
+    List<Book> books = new ArrayList<Book>();
+    books = service.getAllBook();
+    if (books == null || books.size() <= 0) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    return Response.ok(books, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+  }
+  
+  /**
    * get book by book name
    * 
    * @param bookName The name of book
