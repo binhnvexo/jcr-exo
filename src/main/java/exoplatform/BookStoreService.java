@@ -112,4 +112,12 @@ public interface BookStoreService {
    */
   public List<Book> getAllBook();
   
+  /**
+   * get author by book id
+   * 
+   * @param id
+   * @return
+   */
+  public Author getAuthorByBookId(String bookId);
+  
 }

@@ -225,6 +225,58 @@ public class JCRDataStorage {
   }
   
   /**
+   * get author by book id
+   * 
+   * @param id
+   * @return
+   */
+  public Author getAuthorByBookId(String bookId) {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    try {
+      Node book = getBookNode(bookId);
+      Property property = book.getProperty(BookNodeTypes.EXO_BOOK_AUTHOR);
+      String uuid = property.getString();
+      Author author = getAuthorByUUID(uuid);
+      return author;
+    } catch (RepositoryException re) {
+      log.error("Can not find this author", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
+   * get user by name with sql statement
+   * 
+   * @param username
+   * @return
+   */
+  public Author getAuthorByUUID(String uuid) {
+    uuid.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
+    uuid = uuid.trim();
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    StringBuffer queryString = new StringBuffer("Select * from " + BookNodeTypes.EXO_AUTHOR);
+    queryString.append(" where jcr:uuid = '" + uuid + "'");
+    try {
+      QueryManager queryManager = getSession(sProvider).getWorkspace().getQueryManager();
+      Query query = queryManager.createQuery(queryString.toString(), Query.SQL);
+      QueryResult result = query.execute();
+      NodeIterator nodes = result.getNodes();
+      if (nodes.getSize() > 0) {
+        Node node = nodes.nextNode();
+        return Utils.createAuthorByNode(node);
+      }
+      return null;
+    } catch (RepositoryException re) {
+      log.error("Can not get user by name", re);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
    * get author by author id
    * 
    * @param id
@@ -637,6 +689,7 @@ public class JCRDataStorage {
   public List<Book> getAllBook() {
     /* create query string */
     StringBuffer sb = new StringBuffer("Select * from " + BookNodeTypes.EXO_BOOK);
+    sb.append(" order by " + BookNodeTypes.EXO_BOOK_NAME);
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       /* create QueryManager from session */
@@ -673,8 +726,9 @@ public class JCRDataStorage {
     if (!StringUtils.isEmpty(bookName)) {
       /* replace "" sign and - sign */
       bookName = bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
-      sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " = '" + bookName + "'");
+      sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " like '%" + bookName + "%'");
     }
+    sb.append(" order by " + BookNodeTypes.EXO_BOOK_NAME);
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       /* create QueryManager from session */

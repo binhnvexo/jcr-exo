@@ -75,6 +75,25 @@ public class BookStoreRestService implements ResourceContainer {
   }
 
   /**
+   * get author by book id
+   * 
+   * @param id
+   * @return
+   */
+  @GET
+  @RolesAllowed("users")
+  @Path("/searchAuthorByBookId/{bookId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response searchAuthorByBookId(@PathParam("bookId") String bookId) {
+    Author author = new Author();
+    author = service.getAuthorByBookId(bookId);
+    if (author == null) {
+      return Response.status(Status.NO_CONTENT).build();
+    }
+    return Response.ok(author, MediaType.APPLICATION_JSON).cacheControl(cc).build();
+  }
+  
+  /**
    * get all book exist in datastore
    */
   @GET

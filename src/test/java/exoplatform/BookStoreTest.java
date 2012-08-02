@@ -37,6 +37,7 @@ import org.exoplatform.services.rest.impl.InputHeadersMap;
 import org.exoplatform.services.rest.impl.MultivaluedMapImpl;
 import org.exoplatform.services.rest.tools.ByteArrayContainerResponseWriter;
 
+import exoplatform.entity.Author;
 import exoplatform.entity.Book;
 import exoplatform.exception.DuplicateBookException;
 import exoplatform.rest.BookStoreRestService;
