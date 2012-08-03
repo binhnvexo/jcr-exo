@@ -726,7 +726,7 @@ public class JCRDataStorage {
     if (!StringUtils.isEmpty(bookName)) {
       /* replace "" sign and - sign */
       bookName = bookName.replaceAll("\"", "\\\"").replaceAll("-", StringUtils.EMPTY);
-      sb.append(" where " + BookNodeTypes.EXO_BOOK_NAME + " like '%" + bookName + "%'");
+      sb.append(" where CONTAINS(" + BookNodeTypes.EXO_BOOK_NAME + ",'" + bookName + "')");
     }
     sb.append(" order by " + BookNodeTypes.EXO_BOOK_NAME);
     SessionProvider sProvider = SessionProvider.createSystemProvider();
