@@ -332,6 +332,41 @@ public class JCRDataStorage {
   }
   
   /**
+   * add new book to workspace
+   * 
+   * @param book The new book which want to add
+   * @return Book
+   * @throws DuplicateBookException
+   */
+  public Book addBookWithout(Book book) throws DuplicateBookException {
+    SessionProvider sProvider = SessionProvider.createSystemProvider();
+    
+    /* Check exist of book */
+    if (isExistBookName(book.getName(), sProvider)) {
+      throw new DuplicateBookException(String.format("Book %s is existed", book.getName()));
+    }
+    
+    String nodeId = IdGenerator.generate();
+    book.setBookId(nodeId);
+    
+    try {
+      /* execute set data to node and save to workspace */
+      Node parentNode = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_BOOK_PATH, sProvider);
+      Node bookNode = parentNode.addNode("" + book.getBookId(), BookNodeTypes.EXO_BOOK);
+      bookNode.setProperty(BookNodeTypes.EXO_BOOK_NAME, book.getName());
+      bookNode.setProperty(BookNodeTypes.EXO_BOOK_CATEGORY, Utils.bookCategoryEnumToString(book.getCategory()));
+      bookNode.setProperty(BookNodeTypes.EXO_BOOK_CONTENT, book.getContent());
+      parentNode.getSession().save();
+      return Utils.createBookByNode(bookNode);
+    } catch (RepositoryException e) {
+      log.error("Failed to add book", e);
+      return null;
+    } finally {
+      sProvider.close();
+    }
+  }
+  
+  /**
    * add new author
    * 
    * @param author
@@ -584,7 +619,7 @@ public class JCRDataStorage {
   public void deleteBook(String id) throws BookNotFoundException {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
-      Node node = getNodeByPath(DEFAULT_PARENT_PATH + "/" + id, sProvider);
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_BOOK_PATH + "/" + id, sProvider);
       node.remove();
       node.getSession().save();
     } catch (RepositoryException re) {
@@ -639,7 +674,7 @@ public class JCRDataStorage {
     SessionProvider sProvider = SessionProvider.createSystemProvider();
     try {
       /* execute modify data and set to workspace */
-      Node node = getNodeByPath(DEFAULT_PARENT_PATH + "/" + book.getBookId(), sProvider);
+      Node node = getNodeByPath(DEFAULT_PARENT_PATH + DEFAULT_PARENT_BOOK_PATH + "/" + book.getBookId(), sProvider);
       node.setProperty(BookNodeTypes.EXO_BOOK_NAME, book.getName());
       node.setProperty(BookNodeTypes.EXO_BOOK_CONTENT, book.getContent());
       node.setProperty(BookNodeTypes.EXO_BOOK_CATEGORY, Utils.bookCategoryEnumToString(book.getCategory()));

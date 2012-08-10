@@ -98,6 +98,14 @@ public interface BookStoreService {
   public void deleteAuthor(String authorId) throws BookNotFoundException;
   
   /**
+   * delete a book by book id
+   * 
+   * @param id The id of book
+   * @throws BookNotFoundException
+   */
+  public void deleteBook(String id) throws BookNotFoundException;
+  
+  /**
    * edit a exist book
    * 
    * @param book The book want to delete
@@ -119,5 +127,30 @@ public interface BookStoreService {
    * @return
    */
   public Author getAuthorByBookId(String bookId);
+  
+  /**
+   * get book by book id
+   * 
+   * @param id
+   * @return
+   */
+  public Book getBook(String id);
+  
+  /**
+   * edit a exist book
+   * 
+   * @param book The book want to delete
+   * @throws BookNotFoundException
+   */
+  public void editBook(Book book) throws BookNotFoundException;
+  
+  /**
+   * add new book without to workspace
+   * 
+   * @param book The new book which want to add
+   * @return Book
+   * @throws DuplicateBookException
+   */
+  public Book addBookWithout(Book book) throws DuplicateBookException;
   
 }

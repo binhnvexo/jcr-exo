@@ -30,7 +30,11 @@
   <classpathentry kind="var" path="M2_REPO/org/hsqldb/hsqldb/2.0.0/hsqldb-2.0.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/exoplatform/jcr/exo.jcr.component.ext/1.14.0-CR2/exo.jcr.component.ext-1.14.0-CR2.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/exoplatform/kernel/exo.kernel.commons/2.3.0-CR2/exo.kernel.commons-2.3.0-CR2.jar"/>
-  <classpathentry kind="var" path="M2_REPO/xpp3/xpp3/1.1.4c/xpp3-1.1.4c.jar" sourcepath="M2_REPO/xpp3/xpp3/1.1.4c/xpp3-1.1.4c-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/xpp3/xpp3/1.1.4c/xpp3-1.1.4c.jar" sourcepath="M2_REPO/xpp3/xpp3/1.1.4c/xpp3-1.1.4c-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/binhnv/java/exo-dependencies/repository/xpp3/xpp3/1.1.4c/xpp3-1.1.4c-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/binhnv/java/exo-dependencies/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>

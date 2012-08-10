@@ -239,11 +239,7 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
       Node bookNode10 = addBook(book, authorNode10.getName());
 
       Node userNode1 = addUser("binhnv", "12345", "Nguyen Vinh Binh", "Hanoi", "123456789");
-      addUserReference(userNode1.getName(), bookNode1.getName());
-      addUserReference(userNode1.getName(), bookNode3.getName());
       Node userNode2 = addUser("huongdt", "54321", "Doan Thu Huong", "Hanoi", "987654321");
-      addUserReference(userNode2.getName(), bookNode2.getName());
-      addUserReference(userNode1.getName(), bookNode4.getName());
       
     } catch (DuplicateBookException e) {
       e.printStackTrace();
@@ -368,6 +364,18 @@ public class BookStoreServiceImpl implements Startable, BookStoreService {
    */
   public Author getAuthorByBookId(String bookId) {
     return jcrDataStorage.getAuthorByBookId(bookId);
+  }
+
+  public void deleteBook(String id) throws BookNotFoundException {
+    jcrDataStorage.deleteBook(id);
+  }
+
+  public void editBook(Book book) throws BookNotFoundException {
+    jcrDataStorage.editBook(book);
+  }
+
+  public Book addBookWithout(Book book) throws DuplicateBookException {
+    return jcrDataStorage.addBookWithout(book);
   }
   
 }
